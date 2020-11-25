@@ -7,17 +7,9 @@ defmodule Rumbl.Multimedia do
   alias Rumbl.Repo
 
   alias Rumbl.Multimedia.Video
+  alias Rumbl.Multimedia.Category
   alias Rumbl.Accounts
 
-  @doc """
-  Returns the list of videos.
-
-  ## Examples
-
-      iex> list_videos()
-      [%Video{}, ...]
-
-  """
   def list_videos do
     Video
     |> Repo.all()
@@ -31,20 +23,12 @@ defmodule Rumbl.Multimedia do
     |> preload_user()
   end
 
-  @doc """
-  Gets a single video.
+  def list_alphabetical_categories do
+    Category
+    |> Category.alphabetical()
+    |> Repo.all()
+  end
 
-  Raises `Ecto.NoResultsError` if the Video does not exist.
-
-  ## Examples
-
-      iex> get_video!(123)
-      %Video{}
-
-      iex> get_video!(456)
-      ** (Ecto.NoResultsError)
-
-  """
   def get_video!(id), do: preload_user(Repo.get!(Video, id))
 
   def get_user_video!(%Accounts.User{} = user, id) do
@@ -54,18 +38,6 @@ defmodule Rumbl.Multimedia do
     |> preload_user()
   end
 
-  @doc """
-  Creates a video.
-
-  ## Examples
-
-      iex> create_video(%{field: value})
-      {:ok, %Video{}}
-
-      iex> create_video(%{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-  """
   def create_video(%Accounts.User{} = user, attrs \\ %{}) do
     %Video{}
     |> Video.changeset(attrs)
@@ -73,53 +45,24 @@ defmodule Rumbl.Multimedia do
     |> Repo.insert()
   end
 
-  @doc """
-  Updates a video.
-
-  ## Examples
-
-      iex> update_video(video, %{field: new_value})
-      {:ok, %Video{}}
-
-      iex> update_video(video, %{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-  """
   def update_video(%Video{} = video, attrs) do
     video
     |> Video.changeset(attrs)
     |> Repo.update()
   end
 
-  @doc """
-  Deletes a video.
-
-  ## Examples
-
-      iex> delete_video(video)
-      {:ok, %Video{}}
-
-      iex> delete_video(video)
-      {:error, %Ecto.Changeset{}}
-
-  """
   def delete_video(%Video{} = video) do
     Repo.delete(video)
   end
 
-  @doc """
-  Returns an `%Ecto.Changeset{}` for tracking video changes.
-
-  ## Examples
-
-      iex> change_video(video)
-      %Ecto.Changeset{data: %Video{}}
-
-  """
   def change_video(%Accounts.User{} = user, %Video{} = video) do
     video
     |> Video.changeset(%{})
     |> put_user(user)
+  end
+
+  def create_category(name) do
+    Repo.get_by(Category, name: name) || Repo.insert!(%Category{name: name})
   end
 
   defp put_user(changeset, user) do
